@@ -7,9 +7,12 @@
 <body>
     <h1>Todo List</h1>
 
+    <h3><a href="{% url 'task-create' %}">Add new Task</a></h3>
+
     <table>
         <tr>
             <th>TASKS</th>
+            <th>    </th>
             <th>    </th>
         </tr>
             {% for task in tasks %}
@@ -19,6 +22,15 @@
                     </td>
                     <td>
                         <a href="{% url 'task_detail' task.id %}">View</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'task-edit' task.id %}">Edit</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'task-delete' task.id %}">Delete</a>
+                    </td>
+                    <td>
+                        <button type="button">{{ task.completed }}</button>
                     </td>
                 </tr>
             {% empty %}
