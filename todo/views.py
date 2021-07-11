@@ -1,8 +1,11 @@
-from django.shortcuts import render, HttpResponse
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.shortcuts import render, HttpResponse, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+
 from django.urls import reverse_lazy
 
 from .models import Task
@@ -12,11 +15,22 @@ def home(request):
     return HttpResponse('To-do List')
 
 
-class RegistrationView(CreateView):
-    model = User
-    fields = '__all__'
+class RegistrationView(FormView):
+    form_class = UserCreationForm
     template_name = 'todo/auth/registration.html'
+    redirect_authenticated_user = True
     success_url = reverse_lazy('task_list')
+
+    def form_valid(self, form):
+        user = form.save()
+        if user is not None:
+            login(self.request, user)
+        return super(RegistrationView, self).form_valid(form)
+
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('task_list')
+        return super(RegistrationView, self).get(*args, **kwargs)
 
 
 class TaskLoginView(LoginView):
@@ -38,6 +52,12 @@ class TaskListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['tasks'] = context['tasks'].filter(user=self.request.user)
         context['counts'] = context['tasks'].filter(completed=False).count()
+
+        search_input = self.request.GET.get('search-area') or ''
+        if search_input:
+            context['tasks'] = context['tasks'].filter(title__icontains=search_input)
+
+        context['search_input'] = search_input
         return context
 
 
