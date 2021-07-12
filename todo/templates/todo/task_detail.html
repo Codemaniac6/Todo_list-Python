@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Task-detail</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <p><a href="{% url 'task_list' %}">Go back</a></p>
     <h1>Task: {{ task.title }}</h1>
-</body>
-</html>
+[% endblock content %}

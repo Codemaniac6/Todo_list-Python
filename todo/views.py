@@ -51,7 +51,7 @@ class TaskListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tasks'] = context['tasks'].filter(user=self.request.user)
-        context['counts'] = context['tasks'].filter(completed=False).count()
+        context['count'] = context['tasks'].filter(completed=False).count()
 
         search_input = self.request.GET.get('search-area') or ''
         if search_input:
